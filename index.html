@@ -178,6 +178,12 @@ footer{background:var(--olive);padding:52px 20px;border-top:1px solid var(--oliv
   .cta-row .btn-ol,.cta-row .btn-ghost{width:100%;}
 }
 </style>
+
+<!-- Formspree Ajax SDK -->
+<script>
+  window.formspree = window.formspree || function(){(formspree.q=formspree.q||[]).push(arguments);};
+</script>
+<script src="https://unpkg.com/@formspree/ajax@1" defer></script>
 </head>
 <body>
 
@@ -460,20 +466,20 @@ footer{background:var(--olive);padding:52px 20px;border-top:1px solid var(--oliv
     <div style="width:38px;height:3px;background:var(--terra);margin:0 auto;border-radius:2px;"></div>
   </div>
   <div class="form-wrap">
-    <form id="contact-form" onsubmit="handleSubmit(event)">
+    <form id="contact-form">
       <div class="form-grid">
         <div>
           <label>Your Name</label>
-          <input type="text" required placeholder="Full name" class="inp">
+          <input type="text" name="name" required placeholder="Full name" class="inp" data-fs-field>
         </div>
         <div>
           <label>Email Address</label>
-          <input type="email" required placeholder="you@example.com" class="inp">
+          <input type="email" name="email" required placeholder="you@example.com" class="inp" data-fs-field>
         </div>
       </div>
       <div class="form-row">
         <label>Preferred Country</label>
-        <select required class="inp" style="appearance:none;cursor:pointer;color:#555;">
+        <select name="country" required class="inp" style="appearance:none;cursor:pointer;color:#555;" data-fs-field>
           <option value="" disabled selected hidden>Choose target country...</option>
           <option>United States</option>
           <option>United Kingdom</option>
@@ -483,12 +489,13 @@ footer{background:var(--olive);padding:52px 20px;border-top:1px solid var(--oliv
       </div>
       <div class="form-row">
         <label>Your Goals</label>
-        <textarea rows="4" required placeholder="Let us know what course or help you need..." class="inp" style="resize:none;"></textarea>
+        <textarea rows="4" name="message" required placeholder="Let us know what course or help you need..." class="inp" style="resize:none;" data-fs-field></textarea>
       </div>
-      <button type="submit" class="btn-submit">
+      <button type="submit" class="btn-submit" data-fs-submit-btn>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="#BA6B57"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         Send Information Request
       </button>
+      <p data-fs-error style="color:#c0392b;font-size:12px;margin-top:10px;text-align:center;display:none;"></p>
     </form>
     <div id="success-ov" class="fade-in">
       <div class="check-circle">
@@ -728,11 +735,24 @@ document.addEventListener('keydown',e=>{
     document.body.style.overflow='';
   }
 });
-function handleSubmit(e){
-  e.preventDefault();
-  document.getElementById('success-ov').style.display='flex';
-  setTimeout(()=>{ window.open('https://wa.me/2347063412604?text=Hello%20Soventra%2C%20I%20just%20submitted%20an%20inquiry%20through%20your%20website%20contact%20form.%20I%27m%20looking%20forward%20to%20hearing%20from%20you%20soon.','_blank'); }, 1200);
-}
+// ── Formspree integration ────────────────────────────────────────────────────
+window.formspree = window.formspree || function(){(formspree.q=formspree.q||[]).push(arguments);};
+formspree('initForm', {
+  formElement: '#contact-form',
+  formId: 'xdavgwwd',
+  onSuccess: function() {
+    // Show the existing branded success overlay
+    var ov = document.getElementById('success-ov');
+    ov.style.display = 'flex';
+    // Soft WhatsApp nudge after a short delay (optional — remove if unwanted)
+    setTimeout(function(){
+      window.open(
+        'https://wa.me/2347063412604?text=Hello%20Soventra%2C%20I%20just%20submitted%20an%20inquiry%20through%20your%20website%20contact%20form.%20I%27m%20looking%20forward%20to%20hearing%20from%20you%20soon.',
+        '_blank'
+      );
+    }, 1800);
+  }
+});
 const obs=new IntersectionObserver(entries=>{
   entries.forEach(en=>{
     if(en.isIntersecting){
